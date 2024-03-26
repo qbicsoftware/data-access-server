@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,7 +17,6 @@ import life.qbic.data_download.measurements.api.MeasurementData;
 import life.qbic.data_download.measurements.api.MeasurementDataProvider;
 import life.qbic.data_download.measurements.api.MeasurementDataReader;
 import life.qbic.data_download.measurements.api.MeasurementId;
-
 import life.qbic.data_download.rest.exceptions.GlobalException;
 import life.qbic.data_download.rest.exceptions.GlobalException.ErrorCode;
 import life.qbic.data_download.rest.exceptions.GlobalException.ErrorParameters;
@@ -28,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -40,6 +41,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
  * @since <version tag>
  */
 @RestController
+@RequestMapping(path = "/download")
 public class DownloadController {
 
   private final MeasurementDataProvider measurementDataProvider;
@@ -65,8 +67,6 @@ public class DownloadController {
       final HttpServletResponse response,
       @PathVariable("measurementId") String measurementId) {
     var measurementIdentifier = new MeasurementId(measurementId);
-    //TODO validate token
-    //TODO filter measurements for projects the user has access to
     MeasurementData measurementData = measurementDataProvider.loadData(measurementIdentifier);
     if (measurementData == null) {
       throw new GlobalException(ErrorCode.MEASUREMENT_NOT_FOUND, ErrorParameters.of(measurementId));
